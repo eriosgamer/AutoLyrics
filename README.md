@@ -37,7 +37,7 @@ A desktop lyrics viewer for Linux that automatically detects the currently playi
 
 ```bash
 # 1. Clone the repository
-git clone <repo-url> && cd lyrics
+git clone https://github.com/eriosgamer/AutoLyrics.git && cd AutoLyrics
 
 # 2. Create and activate the virtual environment
 python3 -m venv .venv
