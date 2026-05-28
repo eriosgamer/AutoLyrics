@@ -1,4 +1,4 @@
-# Lyrics
+# AutoLyrics
 
 A desktop lyrics viewer for Linux that automatically detects the currently playing song and displays its lyrics in real time. Supports both MPRIS-compatible players and YouTube tabs in Firefox. Japanese lyrics are transliterated to romaji automatically.
 
