@@ -4,6 +4,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 JAPANESE_RE = re.compile(r'[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fff\uff00-\uffef]')
+EXTRA_SPACES = re.compile(r'\s{2,}')
+SPACE_BEFORE_PUNCT = re.compile(r'\s+(?=[\]\)》、。！？?!])')
 
 _kks = None
 
@@ -33,7 +35,10 @@ def to_romaji(text):
 
     try:
         result = kks.convert(text)
-        return ''.join(item['hepburn'] for item in result)
+        spaced = ' '.join(item['hepburn'] for item in result)
+        spaced = SPACE_BEFORE_PUNCT.sub('', spaced)
+        spaced = EXTRA_SPACES.sub(' ', spaced).strip()
+        return spaced
     except Exception as e:
         logger.warning(f"Transliteration failed: {e}")
         return text
