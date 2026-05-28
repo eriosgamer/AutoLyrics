@@ -111,6 +111,7 @@ def parse_window_title(title):
         song = re.sub(r'\s*\(Music Video\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\(Official Video\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\(Official Music Video\)\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*\(Lyric Video\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\(Lyrics?\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\(Audio\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\[OFFICIAL VIDEO\]\s*$', '', song, flags=re.IGNORECASE)
@@ -120,6 +121,11 @@ def parse_window_title(title):
         song = re.sub(r'\s*\[Audio\]\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*[([{]?\s*feat\.?\s+.*?[\])}]?\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*[([{]?\s*ft\.?\s+.*?[\])}]?\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*[-–—]\s*$', '', song)
         song = song.strip()
+
+    if artist:
+        # Keep only first artist in collaborations (A / B, A x B, A vs B)
+        artist = re.sub(r'\s*[/×x]\s*.*$', '', artist).strip()
 
     return song, artist
