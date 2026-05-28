@@ -74,7 +74,7 @@ def parse_window_title(title):
     if not title:
         return None, None
 
-    raw = title.strip()
+    raw = title.replace('\xa0', ' ').strip()
     artist = ''
     song = ''
 
