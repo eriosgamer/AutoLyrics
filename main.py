@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 import sys
+import site
+import os
 import logging
+
+# Bootstrap: add project venv site-packages before any project imports
+_venv = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.venv')
+_sp = os.path.join(_venv, 'lib', f'python{sys.version_info.major}.{sys.version_info.minor}', 'site-packages')
+if os.path.isdir(_sp):
+    site.addsitedir(_sp)
 
 from dotenv import load_dotenv
 load_dotenv()
