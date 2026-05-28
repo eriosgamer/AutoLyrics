@@ -81,6 +81,8 @@ def parse_window_title(title):
         song = re.sub(r'\s*\(Official Music Video\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\(Lyrics?\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\(Audio\)\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*[([{]?\s*feat\.?\s+.*?[\])}]?\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*[([{]?\s*ft\.?\s+.*?[\])}]?\s*$', '', song, flags=re.IGNORECASE)
         song = song.strip()
 
     return song, artist
