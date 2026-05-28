@@ -14,6 +14,7 @@ YOUTUBE_SUFFIX_ALT = re.compile(
 )
 
 HYPRCTL_READY = None
+_last_youtube = None
 
 
 def _check_hyprctl():
@@ -31,6 +32,7 @@ def _check_hyprctl():
 
 
 def get_youtube_window_title():
+    global _last_youtube
     if not _check_hyprctl():
         return None
 
@@ -40,7 +42,7 @@ def get_youtube_window_title():
             capture_output=True, text=True, timeout=2
         )
         if result.returncode != 0:
-            return None
+            return _last_youtube
 
         windows = json.loads(result.stdout)
         for w in windows:
@@ -53,11 +55,13 @@ def get_youtube_window_title():
                 clean = clean.strip()
                 if clean and clean.lower() != 'youtube':
                     logger.debug(f"YouTube tab: {clean} (visible={visible})")
-                    return clean, visible
+                    _last_youtube = (clean, visible)
+                    return _last_youtube
+
     except (json.JSONDecodeError, subprocess.TimeoutExpired, FileNotFoundError) as e:
         logger.debug(f"hyprctl error: {e}")
 
-    return None
+    return _last_youtube
 
 
 TITLE_SPLIT = re.compile(r'\s*[-–—]\s+')
@@ -109,6 +113,11 @@ def parse_window_title(title):
         song = re.sub(r'\s*\(Official Music Video\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\(Lyrics?\)\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*\(Audio\)\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*\[OFFICIAL VIDEO\]\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*\[OFFICIAL MUSIC VIDEO\]\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*\[Lyric Video\]\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*\[Lyrics\]\s*$', '', song, flags=re.IGNORECASE)
+        song = re.sub(r'\s*\[Audio\]\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*[([{]?\s*feat\.?\s+.*?[\])}]?\s*$', '', song, flags=re.IGNORECASE)
         song = re.sub(r'\s*[([{]?\s*ft\.?\s+.*?[\])}]?\s*$', '', song, flags=re.IGNORECASE)
         song = song.strip()
