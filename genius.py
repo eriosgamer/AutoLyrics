@@ -24,8 +24,10 @@ SCRAPE_HEADERS = {
 SEARCH_URL = 'https://genius.com/api/search/song?q={query}'
 
 
-def _search_song(artist, title):
-    query = quote(f"{artist} {title}")
+def _search_song(artist, title, query_str=None):
+    if query_str is None:
+        query_str = f"{artist} {title}" if artist else title
+    query = quote(query_str)
     url = SEARCH_URL.format(query=query)
 
     try:
@@ -146,6 +148,12 @@ def fetch_lyrics(artist, title):
         return None
 
     song = _search_song(artist, title)
+    if not song and title:
+        # Artist may not match (e.g. YouTube alias vs Genius artist),
+        # try title-only search as fallback
+        logger.debug(f"Genius: retrying with title-only for {title}")
+        song = _search_song(artist, title, query_str=title)
+
     if not song or not song.get('url'):
         logger.debug(f"Genius: no song found for {artist} - {title}")
         return None
