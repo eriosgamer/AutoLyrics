@@ -51,7 +51,7 @@ class ModuleFetcher:
 
 def main():
     app = QApplication(sys.argv)
-    app.setApplicationName("Lyrics")
+    app.setApplicationName("AutoLyrics")
 
     font = QFont("sans-serif", 10)
     app.setFont(font)

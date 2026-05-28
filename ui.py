@@ -98,7 +98,7 @@ class LyricsWindow(QMainWindow):
         self._setup_timer()
 
     def _setup_ui(self):
-        self.setWindowTitle("Lyrics")
+        self.setWindowTitle("AutoLyrics")
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
         self.setMinimumSize(420, 250)
         self.resize(520, 520)
