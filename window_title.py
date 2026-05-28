@@ -61,19 +61,47 @@ def get_youtube_window_title():
 
 
 TITLE_SPLIT = re.compile(r'\s*[-–—]\s+')
+JAPANESE_SONG = re.compile(r'「([^」]+)」')
+JAPANESE_PREFIX = re.compile(r'^.*?』')
+METADATA_BRACKETS = re.compile(r'【[^】]+】')
 
 
 def parse_window_title(title):
     if not title:
         return None, None
 
-    song = title.strip()
+    raw = title.strip()
     artist = ''
+    song = ''
 
-    parts = TITLE_SPLIT.split(song, maxsplit=1)
+    # Strip common suffix first
+    cleaned = METADATA_BRACKETS.sub('', raw).strip()
+
+    # Try Japanese bracket format: ...HAYASii「Hunting Soul」
+    song_match = JAPANESE_SONG.search(cleaned)
+    if song_match:
+        song = song_match.group(1).strip()
+        # Everything before the 「...」 bracket (after stripping anime prefix) is the artist
+        before = cleaned[:song_match.start()].strip()
+        before = JAPANESE_PREFIX.sub('', before).strip()
+        if before:
+            # Remove leading punctuation/whitespace
+            before = re.sub(r'^[\s\W]+', '', before).strip()
+            if before:
+                artist = before
+        elif not artist:
+            artist = ''
+        if not song:
+            song = ''
+        return song, artist
+
+    # Standard format: Artist - Title
+    parts = TITLE_SPLIT.split(cleaned, maxsplit=1)
     if len(parts) == 2:
         artist = parts[0].strip()
         song = parts[1].strip()
+    else:
+        song = cleaned
 
     if song:
         song = re.sub(r'\s*\(Music Video\)\s*$', '', song, flags=re.IGNORECASE)
