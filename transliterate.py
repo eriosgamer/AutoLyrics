@@ -3,9 +3,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-JAPANESE_RE = re.compile(r'[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fff\uff00-\uffef]')
+JAPANESE_RE = re.compile(r'[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fff\uff00-\uffef\u2ff0-\u2fff]')
 EXTRA_SPACES = re.compile(r'\s{2,}')
 SPACE_BEFORE_PUNCT = re.compile(r'\s+(?=[\]\)》、。！？?!])')
+
+# Common ideographic description character substitutes (Genius corruption)
+# ⿊ (U+2FCA, IDC left-to-right) → 黒 (U+9ED2, actual kanji for "kuro")
+IDC_FIXES = str.maketrans({
+    '\u2fca': '\u9ed2',
+})
 
 _kks = None
 
@@ -34,7 +40,8 @@ def to_romaji(text):
         return text
 
     try:
-        result = kks.convert(text)
+        cleaned = text.translate(IDC_FIXES)
+        result = kks.convert(cleaned)
         spaced = ' '.join(item['hepburn'] for item in result)
         spaced = SPACE_BEFORE_PUNCT.sub('', spaced)
         spaced = EXTRA_SPACES.sub(' ', spaced).strip()
